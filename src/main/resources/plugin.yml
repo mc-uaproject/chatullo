@@ -1,0 +1,36 @@
+name: Chatullo
+version: '${project.version}'
+main: ua.mykolamurza.chatullo.Chatullo
+api-version: '1.20'
+softdepend: [ PlaceholderAPI, DiscordSRV ]
+permissions:
+  chatullo.reload:
+    description: Allows /chatullo reload command.
+    default: false
+  chatullo.bypass:
+    description: Allows bypassing global chat requirements
+    default: false
+  chatullo.local:
+    description: Allows local chat.
+    default: true
+  chatullo.global:
+    description: Allows global chat.
+    default: true
+  chatullo.msg:
+    description: Allows sending private messages
+    default: true
+  chatullo.free.1:
+    description: Allows getting free global chat shots
+    default: false
+  chatullo.free.2:
+    description: Allows getting free global chat shots
+    default: false
+  chatullo.free.use:
+    description: Allows using free global chat shots
+    default: false
+
+commands:
+  chatullo:
+    description: Used to reload configuration
+  msg:
+    description: Used to send private messages
