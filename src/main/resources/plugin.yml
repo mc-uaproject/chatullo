@@ -1,7 +1,7 @@
 name: Chatullo
-version: '${project.version}'
+version: '1.0'
 main: ua.mykolamurza.chatullo.Chatullo
-api-version: '1.20'
+api-version: '1.21'
 softdepend: [ PlaceholderAPI, DiscordSRV ]
 permissions:
   chatullo.reload:
@@ -34,3 +34,6 @@ commands:
     description: Used to reload configuration
   msg:
     description: Used to send private messages
+  particles:
+    description: Used to turn on or off particles in global chat
+    usage: /particles <on|off>

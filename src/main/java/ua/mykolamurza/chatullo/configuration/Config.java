@@ -56,10 +56,10 @@ public class Config {
     public static void reload() {
         Chatullo.plugin.reloadConfig();
         settings = Chatullo.plugin.getConfig();
+        String localisation = settings.getString("localisation");
 
         for (File file : Objects.requireNonNull(DATA_FOLDER.listFiles())) {
-            if (Objects.equals(settings.getString("localisation"),
-                    file.getName().replace(".yml", ""))) {
+            if (Objects.equals(localisation, file.getName().replace(".yml", ""))) {
                 messages = YamlConfiguration.loadConfiguration(file);
                 break;
             }

@@ -1,9 +1,10 @@
 package ua.mykolamurza.chatullo.listener;
 
-import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,14 +12,15 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.persistence.PersistentDataType;
 import ua.mykolamurza.chatullo.Chatullo;
 import ua.mykolamurza.chatullo.configuration.Config;
 import ua.mykolamurza.chatullo.handler.ChatHandler;
 import ua.mykolamurza.chatullo.handler.MessageType;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -61,10 +63,16 @@ public class PlayerJoin implements Listener {
                 giveItems(player, itemCount);
                 lastLogin.put(playerUUID, today);
                 Chatullo.plugin.saveLastLoginData();
-                player.sendMessage(ChatColor.AQUA + "Дякуємо за підтримку сервера!");
-                player.sendMessage(ChatColor.AQUA + "Ви отримали щоденний подарунок!");
+                player.sendMessage(Component.text("Дякуємо за підтримку сервера!", NamedTextColor.AQUA));
+                player.sendMessage(Component.text("Ви отримали щоденний подарунок!", NamedTextColor.AQUA));
             }
         }
+    }
+    @EventHandler
+    public void onPlayerFirstJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        Chatullo.plugin.getParticles().computeIfAbsent(player.getUniqueId(), func -> true);
+        Chatullo.plugin.saveParticles();
     }
 
     @EventHandler
@@ -77,12 +85,16 @@ public class PlayerJoin implements Listener {
         if (item == null || item.getType() == Material.AIR) {
             return;
         }
-
-        if (item.getType() != Material.REDSTONE) {
+        Material material = Material.valueOf(Config.settings.getString("global-pay.item.material"));
+        if (item.getType() != material) {
             return;
         }
-        NBTItem nbtItem = new NBTItem(item);
-        if (nbtItem.hasTag(Config.settings.getString("global-pay.item.nbt"))) {
+        ItemMeta meta = item.getItemMeta();
+        String custom_data = Config.settings.getString("global-pay.item.custom-data-tag");
+        NamespacedKey key = new NamespacedKey(Chatullo.plugin, custom_data);
+        if (meta.getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
+            event.getPlayer().sendMessage(Component.text("Ваші руки не можуть випустити цей предмет!",
+                    NamedTextColor.GOLD));
             event.setCancelled(true);
         }
     }
@@ -101,14 +113,7 @@ public class PlayerJoin implements Listener {
     }
 
     private void giveItems(Player player, int itemCount) {
-        ItemStack item = new ItemStack(Material.REDSTONE, itemCount);
-        item.editMeta(meta -> {
-            meta.setDisplayName(ChatColor.RESET + "" + ChatColor.RED + "Чарівний пил");
-            meta.setLore(List.of(ChatColor.WHITE + "Приваблює чарівних воронів!", ChatColor.WHITE + "Надає одне спеціальне повідомлення"));
-        });
-        NBT.modify(item, (nbt) -> {
-            nbt.setString("nbt", Config.settings.getString("global-pay.item.nbt"));
-        });
+        ItemStack item = Chatullo.getPayItem(itemCount);
 
         if (player.getInventory().firstEmpty() == -1) {
             player.getLocation().getBlock().getWorld().dropItem(player.getLocation(), item);

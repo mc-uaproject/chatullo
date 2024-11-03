@@ -3,13 +3,15 @@ localisation: "ua"
 
 # Set the radius of local chat.
 radius: 200
+text-display-radius: 50
+local-chat-display-time: 1500 #In ticks
 
-# If the player should pay to use global chat
+allowed-chars: ["☠"]
+
 global-pay:
   item:
-    enabled: false
     material: "REDSTONE"
-    nbt: "GLOBAL"
+    custom-data-tag: "powder-uses"
 
 # Both fully support PlaceholderAPI
 # Global chat format

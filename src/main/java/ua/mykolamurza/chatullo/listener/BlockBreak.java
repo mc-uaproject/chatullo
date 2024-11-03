@@ -1,7 +1,5 @@
 package ua.mykolamurza.chatullo.listener;
 
-import de.tr7zw.nbtapi.NBT;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -9,9 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import ua.mykolamurza.chatullo.configuration.Config;
+import ua.mykolamurza.chatullo.Chatullo;
 
-import java.util.List;
 import java.util.Random;
 
 public class BlockBreak implements Listener {
@@ -31,14 +28,7 @@ public class BlockBreak implements Listener {
     }
 
     private void giveItems(Player player, int itemCount) {
-        ItemStack item = new ItemStack(Material.REDSTONE, itemCount);
-        item.editMeta(meta -> {
-            meta.setDisplayName(ChatColor.RESET + "" + ChatColor.RED + "Чарівний пил");
-            meta.setLore(List.of(ChatColor.WHITE + "Приваблює чарівних воронів!", ChatColor.WHITE + "Надає одне спеціальне повідомлення"));
-        });
-        NBT.modify(item, (nbt) -> {
-            nbt.setString("nbt", Config.settings.getString("global-pay.item.nbt"));
-        });
+        ItemStack item = Chatullo.getPayItem(itemCount);
         player.getWorld().dropItemNaturally(player.getLocation(), item);
     }
 

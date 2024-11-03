@@ -6,11 +6,10 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id("xyz.jpenilla.run-paper") version "2.3.0"
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 repositories {
-    mavenLocal()
+    mavenCentral()
     maven {
         url = uri('https://repo.papermc.io/repository/maven-public/')
     }
@@ -32,15 +31,6 @@ repositories {
     }
 
     maven {
-        name = "CodeMC"
-        url = uri("https://repo.codemc.io/repository/maven-public/")
-    }
-
-    maven {
-        url = uri('https://repo.codemc.org/repository/maven-public/')
-    }
-
-    maven {
         url = uri('https://m2.dv8tion.net/releases')
     }
 
@@ -54,7 +44,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly("de.tr7zw:item-nbt-api-plugin:2.13.2")
     testImplementation libs.org.junit.jupiter.junit.jupiter
     compileOnly libs.io.papermc.paper.paper.api
     compileOnly libs.com.discordsrv.discordsrv
@@ -65,7 +54,7 @@ dependencies {
 group = 'ua.mykolamurza'
 version = '1-SNAPSHOT'
 description = 'Chatullo'
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 publishing {
     publications {
@@ -86,9 +75,9 @@ tasks.withType(Javadoc) {
 
 tasks {
     runServer {
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.1")
         downloadPlugins {
-            modrinth("nbtapi", "2.13.1")
+            modrinth("nbtapi", "2.13.2")
             url("https://download.luckperms.net/1552/bukkit/loader/LuckPerms-Bukkit-5.4.137.jar")
             url("https://ci.md-5.net/job/LibsDisguises/lastSuccessfulBuild/artifact/target/LibsDisguises.jar")
         }
