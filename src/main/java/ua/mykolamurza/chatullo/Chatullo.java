@@ -4,7 +4,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -29,7 +28,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
  * @author Mykola Murza
  * @version Minecraft 1.20
  */
-public final class Chatullo extends JavaPlugin implements CommandExecutor {
+public final class Chatullo extends JavaPlugin {
     public static Chatullo plugin = null;
     public static boolean papi = false;
     private final Map<UUID, LocalDate> lastLogin = new HashMap<>();
