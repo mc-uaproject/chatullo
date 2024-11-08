@@ -28,15 +28,16 @@ public class PlayerChat implements Listener {
         List<Character> extraAllowedChars = Config.settings.getCharacterList("allowed-chars");
 
         StringBuilder extraCharsBuilder = new StringBuilder();
-        for (char c : extraAllowedChars) {
-            extraCharsBuilder.append(Pattern.quote(String.valueOf(c)));
+        for (Character ch : extraAllowedChars) {
+            if ("\\^$.|?*+()[]{}".indexOf(ch) != -1) {
+                extraCharsBuilder.append("\\");
+            }
+            extraCharsBuilder.append(ch);
         }
 
-        String allowedCharsRegex = "^[\\p{IsLatin}\\p{IsCyrillic}\\d\\s"
-                                   + extraCharsBuilder
-                                   + "]+$";
-        Pattern pattern = Pattern.compile(allowedCharsRegex);
+        String combinedPattern = "[\\p{IsCyrillic}\\p{IsLatin}\\d\\p{Punct}\\s" + extraCharsBuilder + "]+";
 
+        Pattern pattern = Pattern.compile(combinedPattern);
         if (!pattern.matcher(message.content()).matches()) {
             player.sendMessage(chatHandler.formatMessage(Config.messages.getString("error.banned")));
             return;
