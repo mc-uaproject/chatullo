@@ -13,6 +13,9 @@ global-pay:
     material: "REDSTONE"
     custom-data-tag: "powder-uses"
 
+magic-bee-receive: "&aМандрівна бджола жужить:"
+magic-bee-send: "&aМандрівна бджола відсилає повідомлення..."
+
 # Both fully support PlaceholderAPI
 # Global chat format
 global-format: "&8[&cG&8]&r &6%player% &e>&r %message%"

@@ -1,9 +1,7 @@
 package ua.mykolamurza.chatullo;
 
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +26,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
  * @author Mykola Murza
  * @version Minecraft 1.20
  */
-public final class Chatullo extends JavaPlugin {
+public final class Chatullo extends JavaPlugin{
     public static Chatullo plugin = null;
     public static boolean papi = false;
     private final Map<UUID, LocalDate> lastLogin = new HashMap<>();
@@ -52,6 +50,7 @@ public final class Chatullo extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuit(ChatHandler.getInstance()), this);
         getServer().getPluginManager().registerEvents(new ItemCraft(plugin), this);
         getServer().getPluginManager().registerEvents(new BlockBreak(), this);
+
 
         Objects.requireNonNull(getCommand("chatullo")).setExecutor(new RootCommand(ChatHandler.getInstance()));
         Objects.requireNonNull(getCommand("chatullo")).setTabCompleter(new RootComplete());
@@ -106,6 +105,7 @@ public final class Chatullo extends JavaPlugin {
             lastLogin.put(UUID.fromString(key), LocalDate.parse(Objects.requireNonNull(dataConfig.getString(key))));
         }
     }
+
     public Map<UUID, Boolean> getParticles() {
         return particles;
     }
@@ -136,7 +136,6 @@ public final class Chatullo extends JavaPlugin {
         particlesConfig = YamlConfiguration.loadConfiguration(particlesFile);
         for (String key : particlesConfig.getKeys(false)) {
             particles.put(UUID.fromString(key), particlesConfig.getBoolean(key));
-            System.out.println(particles.get(UUID.fromString(key)));
         }
     }
 
