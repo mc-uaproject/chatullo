@@ -1,6 +1,7 @@
 package ua.mykolamurza.chatullo;
 
 import net.kyori.adventure.text.format.TextDecoration;
+
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
