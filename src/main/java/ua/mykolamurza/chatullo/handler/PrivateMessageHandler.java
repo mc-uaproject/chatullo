@@ -57,7 +57,7 @@ public class PrivateMessageHandler implements Listener {
         beeDespawnTask = new BukkitRunnable() {
             @Override
             public void run() {
-                recipient.sendMessage(chatHandler.formatMessage(Config.settings.getString("magic-bee-receive")));
+                recipient.sendMessage(chatHandler.formatMessage(Config.messages.getString("magic-bee-receive")));
                 recipient.sendMessage(chatHandler.formatMessage(MessageType.PRIVATE_TO, sender, message));
                 sender.sendMessage(chatHandler.formatMessage(MessageType.PRIVATE_FROM, sender, message));
                 selfDestruct();
@@ -69,7 +69,7 @@ public class PrivateMessageHandler implements Listener {
     @EventHandler
     public void playerClick(PlayerInteractEntityEvent event) {
         if (event.getPlayer().equals(recipient) && event.getRightClicked().equals(bee)) {
-            recipient.sendMessage(chatHandler.formatMessage(Config.settings.getString("magic-bee-receive")));
+            recipient.sendMessage(chatHandler.formatMessage(Config.messages.getString("magic-bee-receive")));
             recipient.sendMessage(chatHandler.formatMessage(MessageType.PRIVATE_TO, sender, message));
             sender.sendMessage(chatHandler.formatMessage(MessageType.PRIVATE_FROM, sender, message));
             selfDestruct();

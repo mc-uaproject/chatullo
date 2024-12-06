@@ -32,7 +32,7 @@ public class Config {
                     continue;
                 }
 
-                File file = new File(DATA_FOLDER.getPath() + "/" + e.getName());
+                File file = new File(DATA_FOLDER.getPath(), e.getName());
 
                 if (!file.exists()) {
                     URL url = Chatullo.plugin.getClass().getResource("/" + e.getName());
@@ -42,7 +42,7 @@ public class Config {
                 }
 
                 if (messages == null) {
-                    if (Objects.equals(settings.getString("localisation"),
+                    if (Objects.equals(settings.getString("localization"),
                             e.getName().replace(".yml", ""))) {
                         messages = YamlConfiguration.loadConfiguration(file);
                     }
@@ -56,10 +56,10 @@ public class Config {
     public static void reload() {
         Chatullo.plugin.reloadConfig();
         settings = Chatullo.plugin.getConfig();
-        String localisation = settings.getString("localisation");
+        String localization = settings.getString("localization");
 
         for (File file : Objects.requireNonNull(DATA_FOLDER.listFiles())) {
-            if (Objects.equals(localisation, file.getName().replace(".yml", ""))) {
+            if (Objects.equals(localization, file.getName().replace(".yml", ""))) {
                 messages = YamlConfiguration.loadConfiguration(file);
                 break;
             }

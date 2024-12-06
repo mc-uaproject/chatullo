@@ -40,7 +40,7 @@ public class ChatHandler {
     private static ChatHandler instance = null;
     private final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
     private AsciiTree tree = null;
-    Map<UUID, List<TextDisplay>> displayMap = new HashMap<>();
+    private final Map<UUID, List<TextDisplay>> displayMap = new HashMap<>();
 
     private ChatHandler() {
     }
@@ -72,7 +72,7 @@ public class ChatHandler {
                     }
                 });
     }
-    public void spawnTextDiplay(Player player, String message, AsyncChatEvent event) {
+    public void spawnTextDisplay(Player player, String message, AsyncChatEvent event) {
         Bukkit.getScheduler().runTask(Chatullo.plugin, bukkitTask -> {
             float height =  Math.ceilDiv(message.length(), 33) * 0.3f;
             for (TextDisplay display : displayMap.getOrDefault(player.getUniqueId(), Collections.emptyList())) {
@@ -118,10 +118,10 @@ public class ChatHandler {
         });
     }
     public void writeToLocalChat(AsyncChatEvent event, Player player, String message) {
-       spawnTextDiplay(player, message, event);
+       spawnTextDisplay(player, message, event);
 
         event.viewers().stream()
-                .filter(audience -> audience instanceof Player && isPlayerHearLocalChat(player, (Player) audience)
+                .filter(audience -> audience instanceof Player audiencePlayer && isPlayerHearLocalChat(player, audiencePlayer)
                         || audience instanceof ConsoleCommandSender)
                 .forEach(recipient ->
                         recipient.sendMessage(formatMessage(MessageType.LOCAL, player, formatMentions(player, recipient, message))));
@@ -202,7 +202,7 @@ public class ChatHandler {
 
             ItemMeta meta = itemStack.getItemMeta();
             if (meta.getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
-                int amount = meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+                int amount = Objects.requireNonNull(meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
                 if (itemStack.getAmount() > 1) {
                     itemStack.setAmount(itemStack.getAmount() - 1);
                     ItemStack item = Chatullo.getPayItem(amount - 1);
@@ -282,8 +282,7 @@ public class ChatHandler {
                 if (Config.settings.getBoolean("mentions.sound.enabled")) {
                     float volume = (float) Config.settings.getDouble("mentions.sound.volume");
                     float pitch = (float) Config.settings.getDouble("mentions.sound.pitch");
-                    String name = Config.settings.getString("mentions.sound.name");
-                    Sound sound = Sound.sound(Key.key(name), Sound.Source.BLOCK, volume, pitch);
+                    Sound sound = Sound.sound(Key.key(Config.settings.getString("mentions.sound.name")), Sound.Source.BLOCK, volume, pitch);
                     recipient.playSound(sound);
                 }
 
@@ -294,5 +293,9 @@ public class ChatHandler {
         }
 
         return formatted;
+    }
+
+    public void shutDown() {
+        displayMap.values().forEach(entities -> entities.forEach(TextDisplay::remove));
     }
 }

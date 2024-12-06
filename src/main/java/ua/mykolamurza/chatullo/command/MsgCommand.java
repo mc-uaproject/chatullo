@@ -18,6 +18,7 @@ import ua.mykolamurza.chatullo.handler.ChatHandler;
 import ua.mykolamurza.chatullo.handler.PrivateMessageHandler;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -30,12 +31,26 @@ public class MsgCommand implements CommandExecutor {
 
     private final ChatHandler chatHandler;
     private final Chatullo chatullo;
-    private Cache<UUID, Long> cooldown = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
+    private final Pattern pattern;
+    private final Cache<UUID, Long> cooldown = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build();
 
 
     public MsgCommand(ChatHandler chatHandler) {
         this.chatHandler = chatHandler;
         this.chatullo = Chatullo.plugin;
+        List<Character> extraAllowedChars = Config.settings.getCharacterList("allowed-chars");
+
+        StringBuilder extraCharsBuilder = new StringBuilder();
+        for (Character ch : extraAllowedChars) {
+            if ("\\^$.|?*+()[]{}".indexOf(ch) != -1) {
+                extraCharsBuilder.append("\\");
+            }
+            extraCharsBuilder.append(ch);
+        }
+
+        String combinedPattern = "[\\p{IsCyrillic}\\p{IsLatin}\\d\\p{Punct}\\s" + extraCharsBuilder + "]+";
+
+        pattern = Pattern.compile(combinedPattern);
     }
 
     @Override
@@ -73,26 +88,13 @@ public class MsgCommand implements CommandExecutor {
                 return true;
             }
 
-            List<Character> extraAllowedChars = Config.settings.getCharacterList("allowed-chars");
-
-            StringBuilder extraCharsBuilder = new StringBuilder();
-            for (Character ch : extraAllowedChars) {
-                if ("\\^$.|?*+()[]{}".indexOf(ch) != -1) {
-                    extraCharsBuilder.append("\\");
-                }
-                extraCharsBuilder.append(ch);
-            }
-
-            String combinedPattern = "[\\p{IsCyrillic}\\p{IsLatin}\\d\\p{Punct}\\s" + extraCharsBuilder + "]+";
-
-            Pattern pattern = Pattern.compile(combinedPattern);
             if (!pattern.matcher(String.join(" ", strings).replaceFirst(playerName, "")).matches()) {
                 sender.sendMessage(chatHandler.formatMessage(Config.messages.getString("error.banned")));
                 return true;
             }
 
             if (chatHandler.payWithItem(sender)) {
-                sender.sendMessage(chatHandler.formatMessage(Config.settings.getString("magic-bee-send")));
+                sender.sendMessage(chatHandler.formatMessage(Config.messages.getString("magic-bee-send")));
                 cooldown.put(sender.getUniqueId(), System.currentTimeMillis() + 10000);
                 spawnBee(player, sender, String.join(" ", strings).replaceFirst(playerName, ""));
             }
@@ -113,7 +115,7 @@ public class MsgCommand implements CommandExecutor {
             zOffset = (Math.random() - 0.5) * radius * 2;
             spawnLocation = recipient.getLocation().add(xOffset, 0, zOffset);
             Bee bee = (Bee) recipient.getWorld().spawnEntity(spawnLocation, EntityType.BEE);
-            if (!bee.getPathfinder().findPath(recipient).canReachFinalPoint()) {
+            if (!Objects.requireNonNull(bee.getPathfinder().findPath(recipient)).canReachFinalPoint()) {
                 bee.remove();
             }else {
                 bee.setInvulnerable(true);
