@@ -13,16 +13,15 @@ import java.util.Random;
 
 public class BlockBreak implements Listener {
 
+    private final Random random = new Random();
+
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Material block = event.getBlock().getType();
-        if (block.equals(Material.REDSTONE_ORE) || block.equals(Material.DEEPSLATE_REDSTONE_ORE)) {
-            if (event.getExpToDrop() > 0) {
-                Random random = new Random();
-                if (random.nextInt(100) < 5) {
-                    giveItems(event.getPlayer(), random.nextInt(3) + 1);
-                    event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1, 1);
-                }
+        if ((block == Material.REDSTONE_ORE || block == Material.DEEPSLATE_REDSTONE_ORE) && event.getExpToDrop() > 0) {
+            if (random.nextInt(100) < 5) {
+                giveItems(event.getPlayer(), random.nextInt(3) + 1);
+                event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1, 1);
             }
         }
     }

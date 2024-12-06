@@ -63,22 +63,22 @@ public class ChatHandler {
     public void writeToGlobalChat(AsyncChatEvent event, Player player, String message) {
         event.viewers().forEach(recipient -> recipient.sendMessage(formatMessage(MessageType.GLOBAL, player, formatMentions(player, recipient, message))));
         event.viewers().stream()
-                .filter(audience -> audience instanceof Player)
+                .filter(Player.class::isInstance)
                 .forEach(recipient -> {
-                    Player player_recipient = (Player) recipient;
+                    Player playerRecipient = (Player) recipient;
 
                     if (Chatullo.plugin.getParticles().getOrDefault(player.getUniqueId(), false)) {
-                        player_recipient.spawnParticle(Particle.END_ROD, player.getLocation().add(0, 0.5, 0), 100, 0,0,0, 0.05);
+                        playerRecipient.spawnParticle(Particle.END_ROD, player.getLocation().add(0, 0.5, 0), 100, 0,0,0, 0.05);
                     }
                 });
     }
     public void spawnTextDiplay(Player player, String message, AsyncChatEvent event) {
         Bukkit.getScheduler().runTask(Chatullo.plugin, bukkitTask -> {
-            float Height =  Math.ceilDiv(message.length(), 33) * 0.3f;
+            float height =  Math.ceilDiv(message.length(), 33) * 0.3f;
             for (TextDisplay display : displayMap.getOrDefault(player.getUniqueId(), Collections.emptyList())) {
                 display.setTransformation(
                         new Transformation(
-                                display.getTransformation().getTranslation().add(0, Height, 0),
+                                display.getTransformation().getTranslation().add(0, height, 0),
                                 new Quaternionf(0, 0, 0, 1),
                                 new Vector3f(1, 1, 1),
                                 new Quaternionf(0, 0, 0, 1)
@@ -104,10 +104,10 @@ public class ChatHandler {
             displayMap.get(player.getUniqueId()).add(textDisplay);
             player.addPassenger(textDisplay);
             event.viewers().stream()
-                    .filter(audience -> audience instanceof Player && isPlayerSeeLocalChat(player, (Player) audience))
+                    .filter(audience -> audience instanceof Player player2 && isPlayerSeeLocalChat(player, player2))
                     .forEach(recipient -> displayMap.getOrDefault(player.getUniqueId(), List.of(textDisplay)).forEach(display -> ((Player) recipient).showEntity(Chatullo.plugin, display)));
             event.viewers().stream()
-                    .filter(audience -> audience instanceof Player && !isPlayerSeeLocalChat(player, (Player) audience))
+                    .filter(audience -> audience instanceof Player player2 && !isPlayerSeeLocalChat(player, player2))
                     .forEach(recipient -> displayMap.getOrDefault(player.getUniqueId(), List.of(textDisplay)).forEach(display -> ((Player) recipient).hideEntity(Chatullo.plugin, display)));
 
             long delay = Config.settings.getInt("local-chat-display-time");
@@ -181,48 +181,49 @@ public class ChatHandler {
     }
 
     public boolean payWithItem(Player player) {
-        if (!player.hasPermission("chatullo.bypass") && !player.isOp()) {
-            PlayerInventory inventory = player.getInventory();
-            Material payItem = Material.valueOf(Config.settings.getString("global-pay.item.material"));
-            if (!inventory.contains(payItem)) {
-                player.sendMessage(formatMessage(Config.messages.getString("error.item")));
-                return false;
-            }
-
-            ItemStack[] items = inventory.getContents();
-            String custom_data = Config.settings.getString("global-pay.item.custom-data-tag");
-            NamespacedKey key = new NamespacedKey(Chatullo.plugin, custom_data);
-            for (ItemStack itemStack : items) {
-                if (itemStack == null) {
-                    continue;
-                }
-                if (itemStack.getType() == payItem) {
-                    ItemMeta meta = itemStack.getItemMeta();
-                    if (meta.getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
-                        int amount = meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
-                        if (itemStack.getAmount() > 1){
-                            itemStack.setAmount(itemStack.getAmount() - 1);
-                            ItemStack item = Chatullo.getPayItem(amount-1);
-                            if (player.getInventory().firstEmpty() == -1) {
-                                player.getLocation().getBlock().getWorld().dropItem(player.getLocation(), item);
-                            } else {
-                                player.getInventory().addItem(item);
-                            }
-                        }else if (amount-1 <= 0) {
-                            player.getInventory().removeItem(itemStack);
-                        }else {
-                            meta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, amount - 1);
-                            itemStack.setItemMeta(meta);
-                        }
-                        return true;
-                    }
-                }
-            }
-            player.sendMessage(formatMessage(Config.messages.getString("error.item")));
-            return false;
-        } else {
+        if (player.hasPermission("chatullo.bypass") || player.isOp()) {
             return true;
         }
+
+        PlayerInventory inventory = player.getInventory();
+        Material payItem = Material.valueOf(Config.settings.getString("global-pay.item.material"));
+        if (!inventory.contains(payItem)) {
+            player.sendMessage(formatMessage(Config.messages.getString("error.item")));
+            return false;
+        }
+
+        String customDataTag = Config.settings.getString("global-pay.item.custom-data-tag");
+        NamespacedKey key = new NamespacedKey(Chatullo.plugin, customDataTag);
+
+        for (ItemStack itemStack : inventory) {
+            if (itemStack == null || itemStack.getType() != payItem) {
+                continue;
+            }
+
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta.getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
+                int amount = meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+                if (itemStack.getAmount() > 1) {
+                    itemStack.setAmount(itemStack.getAmount() - 1);
+                    ItemStack item = Chatullo.getPayItem(amount - 1);
+                    if (inventory.firstEmpty() == -1) {
+                        player.getWorld().dropItem(player.getLocation(), item);
+                    } else {
+                        inventory.addItem(item);
+                    }
+                } else {
+                    if (amount - 1 <= 0) {
+                        inventory.removeItem(itemStack);
+                    } else {
+                        itemStack.setItemMeta(Chatullo.getPayItem(amount - 1).getItemMeta());
+                    }
+                }
+                return true;
+            }
+        }
+
+        player.sendMessage(formatMessage(Config.messages.getString("error.item")));
+        return false;
     }
 
 

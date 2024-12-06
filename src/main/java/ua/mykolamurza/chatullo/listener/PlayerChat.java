@@ -51,14 +51,7 @@ public class PlayerChat implements Listener {
     }
 
     private void writeToTheGlobalChat(AsyncChatEvent event, Player player, TextComponent message) {
-        if (!player.hasPermission("chatullo.global") && !player.isOp()) {
-            player.sendMessage(chatHandler.formatMessage(Config.messages.getString("error.permission")));
-            return;
-        }
-
-        if (chatHandler.payWithItem(player)) {
-            chatHandler.writeToGlobalChat(event, player, message.content().substring(1));
-        }
+        chatHandler.writeToGlobalChat(event, player, message.content().substring(1));
     }
 
     private void writeToTheLocalChat(AsyncChatEvent event, Player player, TextComponent message) {
