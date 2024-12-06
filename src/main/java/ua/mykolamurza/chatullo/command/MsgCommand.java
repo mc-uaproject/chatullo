@@ -88,7 +88,6 @@ public class MsgCommand implements CommandExecutor {
                 return true;
             }
 
-
             if (!pattern.matcher(String.join(" ", strings).replaceFirst(playerName, "")).matches()) {
                 sender.sendMessage(chatHandler.formatMessage(Config.messages.getString("error.banned")));
                 return true;
