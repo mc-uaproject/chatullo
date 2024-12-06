@@ -38,6 +38,11 @@ public final class Chatullo extends JavaPlugin{
     private FileConfiguration particlesConfig;
 
     @Override
+    public void onDisable() {
+        ChatHandler.getInstance().shutDown();
+    }
+
+    @Override
     public void onEnable() {
         plugin = this;
 

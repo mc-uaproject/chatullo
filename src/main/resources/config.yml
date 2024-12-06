@@ -1,5 +1,5 @@
-# Which localisation file should the plugin use
-localisation: "ua"
+# Which localization file should the plugin use
+localization: "ua"
 
 # Set the radius of local chat.
 radius: 200
@@ -12,9 +12,6 @@ global-pay:
   item:
     material: "REDSTONE"
     custom-data-tag: "powder-uses"
-    
-magic-bee-receive: "&aМандрівна бджола жужить:"
-magic-bee-send: "&aМандрівна бджола відсилає повідомлення..."
 
 # Both fully support PlaceholderAPI
 # Global chat format

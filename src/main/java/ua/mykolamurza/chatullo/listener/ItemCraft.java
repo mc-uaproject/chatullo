@@ -18,10 +18,12 @@ import org.bukkit.plugin.Plugin;
 import ua.mykolamurza.chatullo.Chatullo;
 import ua.mykolamurza.chatullo.configuration.Config;
 
+import java.util.Objects;
+
 public class ItemCraft implements Listener {
-    ShapelessRecipe recipe;
-    String custom_data = Config.settings.getString("global-pay.item.custom-data-tag");
-    NamespacedKey key = new NamespacedKey(Chatullo.plugin, custom_data);
+    final ShapelessRecipe recipe;
+    final String custom_data = Config.settings.getString("global-pay.item.custom-data-tag");
+    final NamespacedKey key = new NamespacedKey(Chatullo.plugin, custom_data);
 
     public ItemCraft(Plugin plugin) {
         recipe = new ShapelessRecipe(new NamespacedKey(plugin, "powder-recipe"), Chatullo.getPayItem(1));
@@ -42,7 +44,7 @@ public class ItemCraft implements Listener {
             ItemStack itemStack = event.getInventory().getItem(i);
             if (itemStack == null) continue;
             if (itemStack.getPersistentDataContainer().has(key, PersistentDataType.INTEGER)) {
-                amount += itemStack.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+                amount += Objects.requireNonNull(itemStack.getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
                 isFound = true;
             }
         }
